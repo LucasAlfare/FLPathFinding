@@ -46,7 +46,7 @@ suspend fun findPath(
 
     // if we already explored the max number of "tiles" on this "map",
     // then we don't have solutions, then just finishes the pathfinding
-    if (closed.size == width * height) {
+    if (closed.size == mapWidth * mapHeight) {
       onDone(currExploringNode, false)
       doDelay()
     }
@@ -108,44 +108,9 @@ suspend fun findPath(
 }
 
 /**
- * Just to debug.
- */
-fun tableResult(
-  start: Coord,
-  end: Coord,
-  lastNode: Node,
-  obstacles: List<Coord> = listOf()
-) {
-  val empty = "_"
-  val waypoint = "."
-  val blocked = "#"
-
-  val table = Array(height) { Array(width) { empty } }
-  var tmp = lastNode
-  while (tmp.parent != null) {
-    table[tmp.coord.y][tmp.coord.x] = waypoint
-    tmp = tmp.parent!!
-  }
-
-  table[start.y][start.x] = "!"
-  table[end.y][end.x] = "X"
-
-  obstacles.forEach {
-    table[it.y][it.x] = blocked
-  }
-
-  table.forEach { a ->
-    a.forEach { b ->
-      print("$b  ")
-    }
-    println()
-  }
-}
-
-/**
  * Directly extends a list with [Node] items.
  */
-fun List<Node>.containsNode(node: Node) =
+internal fun List<Node>.containsNode(node: Node) =
   this.any { it.coord.x == node.coord.x && it.coord.y == node.coord.y }
 
 /**
@@ -184,13 +149,49 @@ data class Node(val coord: Coord) {
     val e = Coord(coord.x + 1, coord.y)
     val w = Coord(coord.x - 1, coord.y)
 
-    if (n.inBounds(width, height)) res += Node(n)
-    if (s.inBounds(width, height)) res += Node(s)
-    if (e.inBounds(width, height)) res += Node(e)
-    if (w.inBounds(width, height)) res += Node(w)
+    if (n.inBounds(mapWidth, mapHeight)) res += Node(n)
+    if (s.inBounds(mapWidth, mapHeight)) res += Node(s)
+    if (e.inBounds(mapWidth, mapHeight)) res += Node(e)
+    if (w.inBounds(mapWidth, mapHeight)) res += Node(w)
 
     res.forEach { it.parent = this }
 
     return res
+  }
+}
+
+
+/**
+ * Just to debug.
+ */
+internal fun printPathfindingResult(
+  start: Coord,
+  end: Coord,
+  lastNode: Node,
+  obstacles: List<Coord> = listOf()
+) {
+  val empty = "_"
+  val waypoint = "."
+  val blocked = "#"
+
+  val table = Array(mapHeight) { Array(mapWidth) { empty } }
+  var tmp = lastNode
+  while (tmp.parent != null) {
+    table[tmp.coord.y][tmp.coord.x] = waypoint
+    tmp = tmp.parent!!
+  }
+
+  table[start.y][start.x] = "!"
+  table[end.y][end.x] = "X"
+
+  obstacles.forEach {
+    table[it.y][it.x] = blocked
+  }
+
+  table.forEach { a ->
+    a.forEach { b ->
+      print("$b  ")
+    }
+    println()
   }
 }

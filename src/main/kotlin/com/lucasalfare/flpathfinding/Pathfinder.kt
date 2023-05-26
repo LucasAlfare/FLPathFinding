@@ -71,6 +71,7 @@ suspend fun findPath(
           doDelay()
 
           // after processing, adds it to the open list
+          // to be explored later (if needed in that time)
           open += neighbor
           onOpenListInsertion(neighbor)
           doDelay()

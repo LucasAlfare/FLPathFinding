@@ -1,6 +1,7 @@
 package com.lucasalfare.flpathfinding
 
 
+// TODO: abstract these fields
 const val mapWidth = 8
 const val mapHeight = 8
 

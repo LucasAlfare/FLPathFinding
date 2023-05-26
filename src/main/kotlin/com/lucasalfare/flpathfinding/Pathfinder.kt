@@ -3,6 +3,14 @@ package com.lucasalfare.flpathfinding
 import kotlinx.coroutines.delay
 import kotlin.math.abs
 
+/**
+ * This functions performs A* algorithm based on a start end coordinates.
+ *
+ * This function also offers some callback functions that runs in particular
+ * steps of the algorithm execution.
+ * Normally, those callbacks are used to keep track of what is happening at some
+ * point, making it possible to be used on UI explorers/visualizers.
+ */
 suspend fun findPath(
   start: Coord,
   end: Coord,

@@ -1,13 +1,8 @@
 package com.lucasalfare.flpathfinding
 
-
-// TODO: abstract these fields
-const val mapWidth = 8
-const val mapHeight = 8
-
-var start = Coord(0, 3)
-var end = Coord(3, 4)
-val obstacles = listOf(
+private var start = Coord(0, 3)
+private var end = Coord(3, 4)
+private val obstacles = mutableListOf(
   Coord(2, 2),
   Coord(2, 3),
   Coord(2, 4),

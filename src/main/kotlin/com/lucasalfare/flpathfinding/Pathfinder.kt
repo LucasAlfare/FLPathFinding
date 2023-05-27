@@ -3,6 +3,11 @@ package com.lucasalfare.flpathfinding
 import kotlinx.coroutines.delay
 import kotlin.math.abs
 
+
+// TODO abstract these
+const val mapWidth = 20
+const val mapHeight = 20
+
 /**
  * This functions performs A* algorithm based on a start end coordinates.
  *
@@ -16,16 +21,20 @@ suspend fun findPath(
   end: Coord,
   obstacles: List<Coord> = listOf(),
   delayTimeBetweenSetps: Long = -1,
+  onAlgorithmInitied: () -> Unit = {},
   onUpdateCurrentExploringNode: (Node) -> Unit = {},
   onOpenListInsertion: (Node) -> Unit = {},
   onOpenListRemove: (Node) -> Unit = {},
   onOpenListSort: (List<Node>) -> Unit = {},
   onClosedListInsertion: (Node) -> Unit = {},
   onNodeProcessed: (Node) -> Unit = {},
-  onDone: (Node, Boolean) -> Unit = { _, _ -> }
+  onDone: (Node, Boolean) -> Unit = { _, _ -> },
+  onTogglePause: () -> Boolean = { false },
+  onBreakRequest: () -> Boolean = { false }
 ): Node {
   suspend fun doDelay() {
-    if (delayTimeBetweenSetps > 0) delay(delayTimeBetweenSetps)
+    if (delayTimeBetweenSetps > 0)
+      delay(delayTimeBetweenSetps)
   }
 
   val open = mutableListOf<Node>()
@@ -34,6 +43,7 @@ suspend fun findPath(
   // by default, the first node to be explored is the node with
   // coords of the start
   var currExploringNode = Node(start)
+  onAlgorithmInitied()
   onUpdateCurrentExploringNode(currExploringNode)
   doDelay()
 
@@ -44,72 +54,81 @@ suspend fun findPath(
   doDelay()
 
   while (true) {
-    // if the current exploring node matches the coord of the targeted end
-    // then pathfinding was finished
-    if (currExploringNode.coord.x == end.x && currExploringNode.coord.y == end.y) {
-      onDone(currExploringNode, true)
-      doDelay()
+    println(onBreakRequest())
+    if (onBreakRequest()) {
+      onDone(currExploringNode, false)
       break
     }
 
-    // if we already explored the max number of "tiles" on this "map",
-    // then we don't have solutions, then just finishes the pathfinding
-    if (closed.size == mapWidth * mapHeight) {
-      onDone(currExploringNode, false)
-      doDelay()
-    }
-
-    // always get the neighbors of the current exploring node
-    val neighbors = currExploringNode.getNeighbors()
-    neighbors.forEach { neighbor ->
-      // for each neighbor, we check if its coords are coords of obstacles,
-      // then update its value based on this
-      if (obstacles.any { it.x == neighbor.coord.x && it.y == neighbor.coord.y }) {
-        neighbor.blocked = true
+    println(onTogglePause())
+    if (!onTogglePause()) {
+      // if the current exploring node matches the coord of the targeted end
+      // then pathfinding was finished
+      if (currExploringNode.coord.x == end.x && currExploringNode.coord.y == end.y) {
+        onDone(currExploringNode, true)
+        doDelay()
+        break
       }
 
-      if (!neighbor.blocked) {
-        // for each non-obstacle neighbor, we check if it exists in the
-        // closed or in the open lists
-        if (!open.containsNode(neighbor) && !closed.containsNode(neighbor)) {
-          // if the neighbor doesn't exist in those lists,
-          // then process their costs
-          neighbor.processCosts(start, end)
-          onNodeProcessed(neighbor)
-          doDelay()
+      // if we already explored the max number of "tiles" on this "map",
+      // then we don't have solutions, then just finishes the pathfinding
+      if (closed.size == mapWidth * mapHeight) {
+        onDone(currExploringNode, false)
+        doDelay()
+      }
 
-          // after processing, adds it to the open list
-          // to be explored later (if needed in that time)
-          open += neighbor
-          onOpenListInsertion(neighbor)
-          doDelay()
+      // always get the neighbors of the current exploring node
+      val neighbors = currExploringNode.getNeighbors()
+      neighbors.forEach { neighbor ->
+        // for each neighbor, we check if its coords are coords of obstacles,
+        // then update its value based on this
+        if (obstacles.any { it.x == neighbor.coord.x && it.y == neighbor.coord.y }) {
+          neighbor.blocked = true
+        }
+
+        if (!neighbor.blocked) {
+          // for each non-obstacle neighbor, we check if it exists in the
+          // closed or in the open lists
+          if (!open.containsNode(neighbor) && !closed.containsNode(neighbor)) {
+            // if the neighbor doesn't exist in those lists,
+            // then process their costs
+            neighbor.processCosts(start, end)
+            onNodeProcessed(neighbor)
+            doDelay()
+
+            // after processing, adds it to the open list
+            // to be explored later (if needed in that time)
+            open += neighbor
+            onOpenListInsertion(neighbor)
+            doDelay()
+          }
         }
       }
+
+      // as we explored all neighbors of the current node, then this
+      // node can go to the closed list
+      closed += currExploringNode
+      onClosedListInsertion(currExploringNode)
+      doDelay()
+
+      // as the current node is in the closed list, we can now remove it
+      // from the open list
+      open -= currExploringNode
+      onOpenListRemove(currExploringNode)
+      doDelay()
+
+      // now we sort the open list based on the F cost of its nodes
+      open.sortBy { it.f }
+      onOpenListSort(open)
+      doDelay()
+
+      // finnally, we just update the current node to be the first node
+      // of the sorted list, then, in the next loop, it (and its neighbors)
+      // will be explored
+      currExploringNode = open.first()
+      onUpdateCurrentExploringNode(currExploringNode)
+      doDelay()
     }
-
-    // as we explored all neighbors of the current node, then this
-    // node can go to the closed list
-    closed += currExploringNode
-    onClosedListInsertion(currExploringNode)
-    doDelay()
-
-    // as the current node is in the closed list, we can now remove it
-    // from the open list
-    open -= currExploringNode
-    onOpenListRemove(currExploringNode)
-    doDelay()
-
-    // now we sort the open list based on the F cost of its nodes
-    open.sortBy { it.f }
-    onOpenListSort(open)
-    doDelay()
-
-    // finnally, we just update the current node to be the first node
-    // of the sorted list, then, in the next loop, it (and its neighbors)
-    // will be explored
-    currExploringNode = open.first()
-    onUpdateCurrentExploringNode(currExploringNode)
-    doDelay()
   }
 
   return currExploringNode

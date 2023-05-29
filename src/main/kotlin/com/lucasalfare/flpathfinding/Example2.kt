@@ -138,7 +138,7 @@ class Map : JComponent() {
       findPath(
         start, end,
         obstacles,
-        delayTimeBetweenSetps = 10,
+        delayTimeBetweenSetps = 7,
         onNodeProcessed = {
           state[start.y][start.x] = startFlag
           repaint()

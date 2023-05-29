@@ -134,6 +134,13 @@ suspend fun findPath(
   return currExploringNode
 }
 
+fun findPath2(
+  start: Coord,
+  end: Coord,
+) {
+
+}
+
 /**
  * Directly extends a list with [Node] items.
  */
@@ -163,7 +170,7 @@ data class Node(val coord: Coord) {
   fun processCosts(start: Coord, end: Coord) {
     // not considering diagonals
     g = abs(coord.x - start.x) + abs(coord.y - start.y)
-    h = abs(end.x - start.x) + abs(end.y - start.y)
+    h = abs(coord.x - end.x) + abs(coord.y - end.y)
     f = g + h
   }
 

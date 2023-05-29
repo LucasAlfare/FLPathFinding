@@ -14,7 +14,8 @@ const val mapHeight = 20
  * This function also offers some callback functions that runs in particular
  * steps of the algorithm execution.
  * Normally, those callbacks are used to keep track of what is happening at some
- * point, making it possible to be used on UI explorers/visualizers.
+ * point, making it possible to be used on UI explorers/visualizers or even to track the
+ * algorithm execution and so on.
  */
 suspend fun findPath(
   start: Coord,
@@ -134,13 +135,6 @@ suspend fun findPath(
   return currExploringNode
 }
 
-fun findPath2(
-  start: Coord,
-  end: Coord,
-) {
-
-}
-
 /**
  * Directly extends a list with [Node] items.
  */
@@ -148,10 +142,13 @@ internal fun List<Node>.containsNode(node: Node) =
   this.any { it.coord.x == node.coord.x && it.coord.y == node.coord.y }
 
 /**
- * Represents a bidimensional coordinate inside a space.
+ * Represents a coordinate inside a bidimensional space.
  */
 data class Coord(var x: Int, var y: Int) {
 
+  /**
+   * Returns if this coordinate is inside the bounds of the passed dimensions [w] and [h].
+   */
   fun inBounds(w: Int, h: Int) =
     (x in 0 until w) && (y in 0 until h)
 }
@@ -168,7 +165,7 @@ data class Node(val coord: Coord) {
   private var h: Int = 0
 
   fun processCosts(start: Coord, end: Coord) {
-    // not considering diagonals
+    // not considering diagonals yet
     g = abs(coord.x - start.x) + abs(coord.y - start.y)
     h = abs(coord.x - end.x) + abs(coord.y - end.y)
     f = g + h
@@ -177,7 +174,7 @@ data class Node(val coord: Coord) {
   fun getNeighbors(): MutableList<Node> {
     val res = mutableListOf<Node>()
 
-    // not considering diagonals
+    // not considering diagonals yet
     val n = Coord(coord.x, coord.y + 1)
     val s = Coord(coord.x, coord.y - 1)
     val e = Coord(coord.x + 1, coord.y)

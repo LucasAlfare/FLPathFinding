@@ -1,7 +1,6 @@
 package com.lucasalfare.flpathfinding
 
 import kotlinx.coroutines.delay
-import kotlin.math.abs
 
 
 // TODO abstract these
@@ -18,9 +17,9 @@ const val mapHeight = 20
  * algorithm execution and so on.
  */
 suspend fun findPath(
-  start: Coord,
-  end: Coord,
-  obstacles: List<Coord> = listOf(),
+  start: Coordinate,
+  end: Coordinate,
+  obstacles: List<Coordinate> = listOf(),
   delayTimeBetweenSetps: Long = -1,
   onAlgorithmInitied: () -> Unit = {},
   onUpdateCurrentExploringNode: (Node) -> Unit = {},
@@ -65,7 +64,7 @@ suspend fun findPath(
     if (!onTogglePause()) {
       // if the current exploring node matches the coord of the targeted end
       // then pathfinding was finished
-      if (currExploringNode.coord.x == end.x && currExploringNode.coord.y == end.y) {
+      if (currExploringNode.coordinate.x == end.x && currExploringNode.coordinate.y == end.y) {
         onDone(currExploringNode, true)
         doDelay()
         break
@@ -83,7 +82,7 @@ suspend fun findPath(
       neighbors.forEach { neighbor ->
         // for each neighbor, we check if its coords are coords of obstacles,
         // then update its value based on this
-        if (obstacles.any { it.x == neighbor.coord.x && it.y == neighbor.coord.y }) {
+        if (obstacles.any { it.x == neighbor.coordinate.x && it.y == neighbor.coordinate.y }) {
           neighbor.blocked = true
         }
 
@@ -139,67 +138,16 @@ suspend fun findPath(
  * Directly extends a list with [Node] items.
  */
 internal fun List<Node>.containsNode(node: Node) =
-  this.any { it.coord.x == node.coord.x && it.coord.y == node.coord.y }
-
-/**
- * Represents a coordinate inside a bidimensional space.
- */
-data class Coord(var x: Int, var y: Int) {
-
-  /**
-   * Returns if this coordinate is inside the bounds of the passed dimensions [w] and [h].
-   */
-  fun inBounds(w: Int, h: Int) =
-    (x in 0 until w) && (y in 0 until h)
-}
-
-/**
- * Represents each point inside a map graph.
- */
-data class Node(val coord: Coord) {
-  var parent: Node? = null
-  var f: Int = 0
-  var blocked = false
-
-  private var g: Int = 0
-  private var h: Int = 0
-
-  fun processCosts(start: Coord, end: Coord) {
-    // not considering diagonals yet
-    g = abs(coord.x - start.x) + abs(coord.y - start.y)
-    h = abs(coord.x - end.x) + abs(coord.y - end.y)
-    f = g + h
-  }
-
-  fun getNeighbors(): MutableList<Node> {
-    val res = mutableListOf<Node>()
-
-    // not considering diagonals yet
-    val n = Coord(coord.x, coord.y + 1)
-    val s = Coord(coord.x, coord.y - 1)
-    val e = Coord(coord.x + 1, coord.y)
-    val w = Coord(coord.x - 1, coord.y)
-
-    if (n.inBounds(mapWidth, mapHeight)) res += Node(n)
-    if (s.inBounds(mapWidth, mapHeight)) res += Node(s)
-    if (e.inBounds(mapWidth, mapHeight)) res += Node(e)
-    if (w.inBounds(mapWidth, mapHeight)) res += Node(w)
-
-    res.forEach { it.parent = this }
-
-    return res
-  }
-}
-
+  this.any { it.coordinate.x == node.coordinate.x && it.coordinate.y == node.coordinate.y }
 
 /**
  * Just to debug.
  */
 internal fun printPathfindingResult(
-  start: Coord,
-  end: Coord,
+  start: Coordinate,
+  end: Coordinate,
   lastNode: Node,
-  obstacles: List<Coord> = listOf()
+  obstacles: List<Coordinate> = listOf()
 ) {
   val empty = "_"
   val waypoint = "."
@@ -208,7 +156,7 @@ internal fun printPathfindingResult(
   val table = Array(mapHeight) { Array(mapWidth) { empty } }
   var tmp = lastNode
   while (tmp.parent != null) {
-    table[tmp.coord.y][tmp.coord.x] = waypoint
+    table[tmp.coordinate.y][tmp.coordinate.x] = waypoint
     tmp = tmp.parent!!
   }
 

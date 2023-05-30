@@ -1,14 +1,14 @@
 package com.lucasalfare.flpathfinding
 
-private var start = Coord(0, 3)
-private var end = Coord(3, 4)
+private var start = Coordinate(0, 3)
+private var end = Coordinate(3, 4)
 private val obstacles = mutableListOf(
-  Coord(2, 2),
-  Coord(2, 3),
-  Coord(2, 4),
-  Coord(1, 2),
-  Coord(3, 1),
-  Coord(3, 2)
+  Coordinate(2, 2),
+  Coordinate(2, 3),
+  Coordinate(2, 4),
+  Coordinate(1, 2),
+  Coordinate(3, 1),
+  Coordinate(3, 2)
 )
 
 suspend fun main() {

@@ -11,15 +11,15 @@ import java.awt.event.MouseEvent
 import javax.swing.JComponent
 import javax.swing.JFrame
 
-private var start = Coord(0, 3)
-private var end = Coord(3, 4)
-private val obstacles = listOf(
-  Coord(2, 2),
-  Coord(2, 3),
-  Coord(2, 4),
-  Coord(1, 2),
-  Coord(3, 1),
-  Coord(3, 2)
+private var start = Coordinate(0, 3)
+private var end = Coordinate(3, 4)
+private val obstacles = mutableListOf(
+  Coordinate(2, 2),
+  Coordinate(2, 3),
+  Coordinate(2, 4),
+  Coordinate(1, 2),
+  Coordinate(3, 1),
+  Coordinate(3, 2)
 )
 
 class Window : JFrame() {
@@ -59,11 +59,14 @@ class Map : JComponent() {
   private val auxJob = Job()
 
   private val mouseAdapter = object : MouseAdapter() {
+
     override fun mouseReleased(e: MouseEvent) {
+      currClickX = (e.x) / cellSize
+      currClickY = (e.y) / cellSize
+
       if (e.button == MouseEvent.BUTTON1) {
         currClickX = (e.x) / cellSize
         currClickY = (e.y) / cellSize
-        println("grid: $currClickX,$currClickY")
 
         start.x = end.x
         start.y = end.y
@@ -72,6 +75,13 @@ class Map : JComponent() {
         end.y = currClickY
 
         doPathfinding()
+      } else if (e.button == MouseEvent.BUTTON3) {
+        val nextObstacle = Coordinate(currClickX, currClickY)
+        if (!obstacles.any { it.x == nextObstacle.x && it.y == nextObstacle.y }) {
+          obstacles += nextObstacle
+          state[nextObstacle.y][nextObstacle.x] = obstacleFlag
+          repaint()
+        }
       }
     }
   }
@@ -138,7 +148,7 @@ class Map : JComponent() {
       findPath(
         start, end,
         obstacles,
-        delayTimeBetweenSetps = 7,
+        delayTimeBetweenSetps = 10,
         onNodeProcessed = {
           state[start.y][start.x] = startFlag
           repaint()
@@ -150,16 +160,16 @@ class Map : JComponent() {
         },
         onOpenListSort = {
           val first = it.first()
-          state[first.coord.y][first.coord.x] = endFlag
+          state[first.coordinate.y][first.coordinate.x] = endFlag
         },
         onClosedListInsertion = {
-          state[it.coord.y][it.coord.x] = processedNodeFlag
+          state[it.coordinate.y][it.coordinate.x] = processedNodeFlag
         },
         onDone = { node, pathSuccessfulFound ->
           if (pathSuccessfulFound) {
             var tmp = node
             while (tmp.parent != null) {
-              state[tmp.coord.y][tmp.coord.x] = waypointFlag
+              state[tmp.coordinate.y][tmp.coordinate.x] = waypointFlag
               tmp = tmp.parent!!
             }
 

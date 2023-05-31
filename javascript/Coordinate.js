@@ -1,3 +1,5 @@
+import Map from './Map.js'
+
 /**
  * Class used to represent a single coordinate of a two-dimensional space.
  *
@@ -19,15 +21,14 @@ class Coordinate {
      * Function used to check if this coodinates pair is inside a rect of dimensions
      * width and height.
      *
-     * @param {number} width checking width
-     * @param {number} height checking height
+     * @param {Map} map the actual map that this coordinate is in.
      *
      * @returns {boolean} true if this coordinate is inside the bounds, otherwise {boolean} false
      */
-    inBounds(width, height) {
+    inBounds(map) {
         return (
-            (x >= 0 && x < width) &&
-            (y >= 0 && y < height)
+            (x >= 0 && x < map.width) &&
+            (y >= 0 && y < map.height)
         );
     }
 }

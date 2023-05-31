@@ -1,4 +1,5 @@
-import Coordinate from "./Coordinate";
+import Coordinate from "./Coordinate.js";
+import Utils from "./Utils.js";
 
 /**
  * A node is a representation of a point inside a two-dimensional space.
@@ -10,7 +11,7 @@ class Node {
     /**
      * Creates a new node object with the coord from param.
      *
-     * @param {Coordinate} coordinate
+     * @param {Coordinate} coordinate the coordinate of this node.
      */
     constructor(coordinate) {
         this.coordinate = coordinate;
@@ -28,35 +29,31 @@ class Node {
      * @param {Coordinate} end the targeted end coordiante that the path aims on.
      */
     processCosts(start, end) {
-        this.g = Math.abs(this.coordinate.x - start.x) + Math.abs(this.coordinate.y - start.y);
-        this.h = Math.abs(this.coordinate.x - end.x) + Math.abs(this.coordinate.y - end.y);
+        this.g = Utils.euclideanDistance(this.coordinate, start);
+        this.h = Utils.euclideanDistance(this.coordinate, end);
         this.f = this.g + this.h;
     }
 
     /**
      * This method is used to get the actual neighbors (other surrounding nodes)
      * of this current node.
-     * @param {number} width the current width of the space where this node is being processed.
-     * @param {number} height the current height of the space where this node is being processed.
+     * @param {Map} the actual map that this node is in.
      *
      * @returns {Array<Node>} list of the actual neighbors of this current node.
      */
-    getNeighbors(width, height) {
+    getNeighbors(map) {
         const results = [];
-
-        const north = new Coordinate(this.coordinate.x, this.coordinate.y - 1);
-        const south = new Coordinate(this.coordinate.x, this.coordinate.y + 1);
-        const east = new Coordinate(this.coordinate.x + 1, this.coordinate.y);
-        const west = new Coordinate(this.coordinate.x - 1, this.coordinate.y);
-
-        if (north.inBounds(width, height)) results.push(new Node(north));
-        if (south.inBounds(width, height)) results.push(new Node(south));
-        if (east.inBounds(width, height)) results.push(new Node(east));
-        if (west.inBounds(width, height)) results.push(new Node(west));
-
-        // err...?
-        const self = this;
-        results.forEach(n => { n.parent = self });
+        for (let y = -1; y <= 1; y++) {
+            for (let x = -1; x <= 1; x++) {
+                if (x !== 0 && y !== 0) {
+                    const nextNeighborCoordinate = new Coordinate(x, y);
+                    if (nextNeighborCoordinate.inBounds(map)) {
+                        nextNeighborCoordinate.parent = this;
+                        results.push(nextNeighborCoordinate);
+                    }
+                }
+            }
+        }
 
         return results;
     }

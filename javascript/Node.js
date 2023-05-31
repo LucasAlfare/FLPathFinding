@@ -1,5 +1,5 @@
-import Coordinate from "./Coordinate.js";
-import Utils from "./Utils.js";
+// import Coordinate from "./Coordinate.js";
+// import Utils from "./Utils.js";
 
 /**
  * A node is a representation of a point inside a two-dimensional space.
@@ -45,11 +45,11 @@ class Node {
         const results = [];
         for (let y = -1; y <= 1; y++) {
             for (let x = -1; x <= 1; x++) {
-                if (x !== 0 && y !== 0) {
-                    const nextNeighborCoordinate = new Coordinate(x, y);
+                if (x !== 0 || y !== 0) {
+                    const nextNeighborCoordinate = new Coordinate(this.coordinate.x + x, this.coordinate.y + y);
                     if (nextNeighborCoordinate.inBounds(map)) {
                         nextNeighborCoordinate.parent = this;
-                        results.push(nextNeighborCoordinate);
+                        results.push(new Node(nextNeighborCoordinate));
                     }
                 }
             }
@@ -59,4 +59,4 @@ class Node {
     }
 }
 
-export default Node;
+// export default Node;

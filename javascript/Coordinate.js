@@ -1,4 +1,4 @@
-import Map from './Map.js'
+// import Map from './Map.js'
 
 /**
  * Class used to represent a single coordinate of a two-dimensional space.
@@ -27,10 +27,10 @@ class Coordinate {
      */
     inBounds(map) {
         return (
-            (x >= 0 && x < map.width) &&
-            (y >= 0 && y < map.height)
+            (this.x >= 0 && this.x < map.width) &&
+            (this.y >= 0 && this.y < map.height)
         );
     }
 }
 
-export default Coordinate;
+// export default Coordinate;

@@ -1,5 +1,5 @@
-import Coordinate from "./Coordinate.js";
-import Node from "./Node.js";
+// import Coordinate from "./Coordinate.js";
+// import Node from "./Node.js";
 
 const Utils = {
     /**
@@ -24,7 +24,7 @@ const Utils = {
      * @param {Array<Node>} nodes the source array of nodes to be sorted.
      */
     sortNodesByFCost: function (nodes) {
-        nodes.sort(function (a, b) {
+        return nodes.sort(function (a, b) {
             return a.f - b.f;
         });
     },
@@ -43,4 +43,4 @@ const Utils = {
     }
 };
 
-export default Utils;
+// export default Utils;

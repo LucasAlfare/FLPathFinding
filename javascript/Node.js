@@ -37,7 +37,7 @@ class Node {
     /**
      * This method is used to get the actual neighbors (other surrounding nodes)
      * of this current node.
-     * @param {Map} the actual map that this node is in.
+     * @param {Map} map the actual map that this node is in.
      *
      * @returns {Array<Node>} list of the actual neighbors of this current node.
      */
